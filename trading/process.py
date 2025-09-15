@@ -53,5 +53,6 @@ async def process_stock_chunk_with_chain_ws(stock_code: str, websocket: WebSocke
         return parsed_result
     except Exception as e:
         print(f"股票 {stock_code} 分析失败: {e}")
+        await websocket.send_text(f"股票 {stock_code} 分析失败: {e}")
         return None
 

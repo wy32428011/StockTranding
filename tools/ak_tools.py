@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 from langchain.tools import tool
 import akshare as ak
@@ -50,7 +52,8 @@ def get_stock_info_csv(symbol: str):
     :param symbol: 股票编码
     :return: 股票信息
     """
-    df = pd.read_csv('./graph_demo/A股股票列表.csv',
+    # os.path.exists('./A股股票列表.csv')
+    df = pd.read_csv('./tools/A股股票列表.csv',
                      encoding='utf-8',
                      dtype={'代码': str, '名称': str, '最新价': float})
     df = df[df["代码"] == symbol]

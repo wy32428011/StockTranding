@@ -7,6 +7,7 @@ def get_prompt_chain(stock_schema: str):
     获取Prompt
     :param stock_schema: 股票数据格式
     :return: Prompt
+        - **新闻资讯**：调用bocha_websearch_tool获取近7天相关新闻（用于情感分析）
     """
     prompt = (ChatPromptTemplate.from_messages([
         ("system", f"""您是具有15年从业经验的资深股票分析师，具备CFA和FRM双重认证。请基于多维度数据进行专业分析，重点预测短期价格走向。
@@ -19,7 +20,7 @@ def get_prompt_chain(stock_schema: str):
     - **股票基础信息**：调用get_stock_info_csv获取股票基础信息（含最新价）
     - **历史行情**：调用get_stock_history获取30日K线数据（收盘价、成交量）
     - **技术指标**：调用tech_tool获取MA5/MA10、MACD（DIF/DEA/柱状体）、RSI指标  
-    - **新闻资讯**：调用bocha_websearch_tool获取近7天相关新闻（用于情感分析）
+
 
     ### 2. 分析维度（每项需量化说明对价格走向的影响权重）
     | 维度         | 核心分析指标                                                                 | 预测权重 |
