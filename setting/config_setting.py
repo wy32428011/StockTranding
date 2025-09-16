@@ -1,8 +1,11 @@
 # 模型配置
 LLM_CONFIG = {
-    "base_url": "http://192.168.60.146:9090/v1",
-    "api_key": "qwen",
-    "model": "qwen"
+    # "base_url": "http://192.168.60.146:9090/v1",
+    # "api_key": "qwen",
+    # "model": "qwen",
+    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "api_key": "sk-63affe170adb4389b2e50438e923d116",
+    "model": "qwen-plus-2025-09-11"
 }
 # Ollama模型配置
 OLLAMA_CHAT_CONFIG = {

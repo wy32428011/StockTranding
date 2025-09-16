@@ -13,10 +13,11 @@ def get_chain_executor():
     :return:
     """
     llm = get_chat_openai()
+    # llm = llm.with_structured_output(StockReport)
     stock_schema = str(StockReport.model_json_schema()).replace('{', '{{').replace('}', '}}')
     prompt = get_prompt_chain(stock_schema)
-    # tools = [get_stock_info_csv, get_stock_history, tech_tool, bocha_websearch_tool]
-    tools = [get_stock_info_csv, get_stock_history, tech_tool]
+    tools = [get_stock_info_csv, get_stock_history, tech_tool, bocha_websearch_tool]
+    # tools = [get_stock_info_csv, get_stock_history, tech_tool]
     agent = create_openai_tools_agent(llm, tools, prompt)
     executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
     return executor

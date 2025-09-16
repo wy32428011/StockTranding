@@ -5,7 +5,7 @@ from langchain.tools import tool
 import akshare as ak
 from datetime import datetime, timedelta
 import talib as ta
-
+import os
 # === 工具1：获取股票一周历史行情 ===
 @tool
 def get_stock_history(symbol: str) -> str:
@@ -14,6 +14,8 @@ def get_stock_history(symbol: str) -> str:
     :param symbol: 股票编码
     :return:
     """
+    os.environ["http_proxy"] = "http://127.0.0.1:7890"
+    os.environ["https_proxy"] = "http://127.0.0.1:7890"
     print("===============================开始获取30天历史数据=======================================")
     end = datetime.now()
     start = end - timedelta(days=30)
@@ -27,6 +29,8 @@ def tech_tool(symbol: str) -> dict:
     :param symbol: 股票编码
     :return: 技术指标数据
     """
+    os.environ["http_proxy"] = "http://127.0.0.1:7890"
+    os.environ["https_proxy"] = "http://127.0.0.1:7890"
     print("===============================开始获取技术指标数据=======================================")
     df = ak.stock_zh_a_hist(symbol=symbol, period="daily",
                             start_date=(datetime.now() - timedelta(days=60)).strftime("%Y%m%d"), adjust="")
@@ -46,7 +50,7 @@ def tech_tool(symbol: str) -> dict:
 
 
 @tool
-def get_stock_info_csv(symbol: str):
+def get_stock_info_csv(symbol: str) -> str:
     """
     获取股票信息
     :param symbol: 股票编码
