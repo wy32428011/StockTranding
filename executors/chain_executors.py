@@ -19,5 +19,5 @@ def get_chain_executor():
     tools = [get_stock_info_csv, get_stock_history, tech_tool, bocha_websearch_tool]
     # tools = [get_stock_info_csv, get_stock_history, tech_tool]
     agent = create_openai_tools_agent(llm, tools, prompt)
-    executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+    executor = AgentExecutor(agent=agent, tools=tools, verbose=True,handle_parsing_errors=True)
     return executor

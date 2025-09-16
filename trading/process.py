@@ -34,6 +34,8 @@ async def process_stock_chunk_with_chain_ws(stock_code: str, websocket: WebSocke
             except Exception as ex:
                 print(f"发送股票 {stock_code} 分析失败: {ex}")
         print(result)
+        if result.startswith("{'properties':"):
+            result = result.replace("{'properties':","").rstrip("}")
         parser = JsonOutputParser(pydantic_object=StockReport)
         parsed_result = parser.parse(result)
         print("parsed_result",parsed_result)

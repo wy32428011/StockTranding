@@ -40,6 +40,7 @@ def tech_tool(symbol: str) -> dict:
     ma10 = ta.MA(close, timeperiod=10)
     macd, macd_signal, macd_hist = ta.MACD(close)
     rsi = ta.RSI(close, timeperiod=14)
+
     print(ma5)
     return {
         "MA5": ma5,
