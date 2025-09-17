@@ -120,10 +120,10 @@ def get_prompt():
 
 ### 重要输出要求
 - **必须使用中文回答**
-### 数据收集
+### 数据收集 （必须按顺序执行,每个方法只需要执行一次）
    - 调用get_stock_info_csv获取股票基础信息（含最新价）
    - 调用get_stock_history获取30日K线数据（收盘价、成交量）
-   - 调用tech_tool获取技术指标（MA5/MA10、MACD、RSI）
+   - 调用tech_tool获取技术指标（MA5/MA10、MACD、RSI、KDJ、布林带）
    - 调用bocha_websearch_tool获取近7天相关新闻（用于情感分析）
 ### 1. 基本面深度分析
 #### 1.1 行业与估值核心指标

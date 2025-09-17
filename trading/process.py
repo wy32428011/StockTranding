@@ -34,26 +34,26 @@ async def process_stock_chunk_with_chain_ws(stock_code: str, websocket: WebSocke
             except Exception as ex:
                 print(f"发送股票 {stock_code} 分析失败: {ex}")
         print(result)
-        if result.startswith("{'properties':"):
-            result = result.replace("{'properties':","").rstrip("}")
-        parser = JsonOutputParser(pydantic_object=StockReport)
-        parsed_result = parser.parse(result)
-        print("parsed_result",parsed_result)
-        db: Session = next(get_db())
+        # if result.startswith("{'properties':"):
+        #     result = result.replace("{'properties':","").rstrip("}")
+        # parser = JsonOutputParser(pydantic_object=StockReport)
+        # parsed_result = parser.parse(result)
+        # print("parsed_result",parsed_result)
+        # db: Session = next(get_db())
         # 假设result中包含symbol和name信息
-        rating_record = InvestmentRating(
-            symbol=parsed_result.get('symbol', ''),
-            name=parsed_result.get('name', ''),
-            rating=parsed_result['investment_rating'],
-            current_price=parsed_result.get('current_price', None),
-            target_price=parsed_result.get('target_price', None),
-            analysis_date=datetime.strptime(parsed_result.get('analysis_date', ''), '%Y-%m-%d') if parsed_result.get(
-                'analysis_date') else None,
-            result_json=parsed_result
-        )
-        db.add(rating_record)
-        db.commit()
-        db.refresh(rating_record)
+        # rating_record = InvestmentRating(
+        #     symbol=parsed_result.get('symbol', ''),
+        #     name=parsed_result.get('name', ''),
+        #     rating=parsed_result['investment_rating'],
+        #     current_price=parsed_result.get('current_price', None),
+        #     target_price=parsed_result.get('target_price', None),
+        #     analysis_date=datetime.strptime(parsed_result.get('analysis_date', ''), '%Y-%m-%d') if parsed_result.get(
+        #         'analysis_date') else None,
+        #     result_json=parsed_result
+        # )
+        # db.add(rating_record)
+        # db.commit()
+        # db.refresh(rating_record)
         return result
     except Exception as e:
         print(f"股票 {stock_code} 分析失败: {e}")

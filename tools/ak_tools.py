@@ -39,10 +39,9 @@ def tech_tool(symbol: str) -> dict:
     print("===============================开始获取技术指标数据=======================================")
     df = ak.stock_zh_a_hist(symbol=symbol, period="daily",
                             start_date=(datetime.now() - timedelta(days=60)).strftime("%Y%m%d"), adjust="")
-    close = np.array(df["收盘"], dtype=np.float32)
-    high_prices = np.array(df["最高"], dtype=np.float32)
-    low_prices = np.array(df["最低"], dtype=np.float32)
-
+    close = pd.to_numeric(df["收盘"])
+    high_prices = pd.to_numeric(df["最高"])
+    low_prices = pd.to_numeric(df["最低"])
     ma5 = ta.MA(close, timeperiod=5)
     ma10 = ta.MA(close, timeperiod=10)
     macd, macd_signal, macd_hist = ta.MACD(close)

@@ -5,7 +5,7 @@ LLM_CONFIG = {
     # "model": "qwen",
     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
     "api_key": "sk-63affe170adb4389b2e50438e923d116",
-    "model": "qwen-plus-2025-09-11"
+    "model": "qwen-plus-2025-07-28"
 }
 # Ollama模型配置
 OLLAMA_CHAT_CONFIG = {
