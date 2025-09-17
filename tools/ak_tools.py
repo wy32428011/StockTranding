@@ -1,11 +1,16 @@
 import os
 
+import numpy as np
 import pandas as pd
 from langchain.tools import tool
 import akshare as ak
 from datetime import datetime, timedelta
 import talib as ta
 import os
+
+from talib import MA_Type
+
+
 # === 工具1：获取股票一周历史行情 ===
 @tool
 def get_stock_history(symbol: str) -> str:
@@ -34,19 +39,40 @@ def tech_tool(symbol: str) -> dict:
     print("===============================开始获取技术指标数据=======================================")
     df = ak.stock_zh_a_hist(symbol=symbol, period="daily",
                             start_date=(datetime.now() - timedelta(days=60)).strftime("%Y%m%d"), adjust="")
-    close = pd.to_numeric(df["收盘"])
+    close = np.array(df["收盘"], dtype=np.float32)
+    high_prices = np.array(df["最高"], dtype=np.float32)
+    low_prices = np.array(df["最低"], dtype=np.float32)
 
     ma5 = ta.MA(close, timeperiod=5)
     ma10 = ta.MA(close, timeperiod=10)
     macd, macd_signal, macd_hist = ta.MACD(close)
     rsi = ta.RSI(close, timeperiod=14)
-
-    print(ma5)
+    slowk, slowd = ta.STOCH(
+        high_prices, low_prices, close,
+        fastk_period=9, slowk_period=3, slowk_matype=MA_Type.SMA,
+        slowd_period=3, slowd_matype=MA_Type.SMA
+    )
+    # 计算J值
+    slowj = 3 * slowk - 2 * slowd
+    # 计算布林带三线
+    upper, middle, lower = ta.BBANDS(
+        close,
+        timeperiod=20,  # 默认周期
+        nbdevup=2,  # 上轨标准差倍数
+        nbdevdn=2,  # 下轨标准差倍数
+        matype=MA_Type.SMA,   # 移动平均类型（0=SMA）
+    )
     return {
         "MA5": ma5,
         "MA10": ma10,
         "MACD": macd,
-        "RSI": rsi
+        "RSI": rsi,
+        "SLOWK": slowk,
+        "SLOWD": slowd,
+        "SLOWJ": slowj,
+        "UPPER": upper,
+        "MIDDLE": middle,
+        "LOWER": lower,
     }
 
 
