@@ -1,6 +1,9 @@
 from langchain.tools import tool
 import requests
-BOCHA_API_KEY = "sk-bdce09f8b03a4adaa2a806f75099e42e"
+from setting.config_setting import SYSTEM_CONFIG
+# 从配置中获取Bocha Web Search API配置
+BOCHA_API_URL: str = SYSTEM_CONFIG["bocha_websearch"]["BOCHA_API_URL"]
+BOCHA_API_KEY: str = SYSTEM_CONFIG["bocha_websearch"]["BOCHA_API_KEY"]
 # 定义Bocha Web Search工具
 @tool
 def bocha_websearch_tool(query: str, count: int = 10) -> str:

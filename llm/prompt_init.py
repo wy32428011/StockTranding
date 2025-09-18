@@ -1,6 +1,8 @@
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.prompts import MessagesPlaceholder
 
+from tools.web_search import bocha_websearch_tool
+
 
 def get_prompt_chain(stock_schema: str):
     """
@@ -114,6 +116,11 @@ def get_prompt_chain(stock_schema: str):
 
 
 def get_prompt():
+    from setting.config_setting import SYSTEM_CONFIG
+    BOCHA_ENABLED: bool = SYSTEM_CONFIG["bocha_websearch"]["ENABLED"]
+    bocha_websearch_prompt = ""
+    if BOCHA_ENABLED:
+        bocha_websearch_prompt = """- 调用bocha_websearch_tool获取近7天相关新闻（用于情感分析）"""
     prompt = ChatPromptTemplate.from_messages([
         ("system", f"""
 您是具有15年从业经验的资深股票分析师，具备CFA和FRM双重认证。请基于多维度数据进行专业分析，重点预测短期价格走向。
@@ -124,7 +131,7 @@ def get_prompt():
    - 调用get_stock_info_csv获取股票基础信息（含最新价）
    - 调用get_stock_history获取30日K线数据（收盘价、成交量）
    - 调用tech_tool获取技术指标（MA5/MA10、MACD、RSI、KDJ、布林带）
-   - 调用bocha_websearch_tool获取近7天相关新闻（用于情感分析）
+   {bocha_websearch_prompt}
 ### 1. 基本面深度分析
 #### 1.1 行业与估值核心指标
 *   **行业概念**：需分析「行业赛道属性（成长 / 成熟 / 衰退）」「政策支持 / 限制因素」「行业竞争格局（龙头 / 分散）」「上下游产业链关联度」

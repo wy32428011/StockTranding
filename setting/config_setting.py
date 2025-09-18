@@ -22,3 +22,13 @@ DB_CONFIG = {
     "password": "root",
     "database": "investment_ratings"
 }
+ALLTICK_CONFIG = {
+    "ALLTICK_API_KEY": "09ab7e110950969ece587b50aa87ede9-c-app"
+}
+SYSTEM_CONFIG = {
+    "bocha_websearch" : {
+        "ENABLED": False,
+        "BOCHA_API_URL": "https://api.bochaai.com/v1/web-search",
+        "BOCHA_API_KEY": "sk-bdce09f8b03a4adaa2a806f75099e42e"
+    }
+}

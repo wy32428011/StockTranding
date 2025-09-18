@@ -1,3 +1,4 @@
+import math
 import time
 
 import pandas as pd
@@ -8,12 +9,13 @@ from sqlalchemy.orm import Session
 
 from db.database import get_db
 from models.stock_info import StockInfo
+from setting.config_setting import ALLTICK_CONFIG
 
 test_header = {
     "Content-Type": "application/json",
 }
 # 雪球token
-alltick_token = "09ab7e110950969ece587b50aa87ede9-c-app"
+alltick_token = ALLTICK_CONFIG["ALLTICK_API_KEY"]
 # 雪球股票api基础地址
 base_alltick_url = f"https://quote.alltick.io/quote-stock-b-api/static_info?token={alltick_token}&query="
 max_query = 10
@@ -27,19 +29,20 @@ data_index = 0
 db: Session = next(get_db())
 table_symbols = [symbol[0] for symbol in db.query(StockInfo.symbol).all()]
 new_symbols = list(set(df_list) - set(table_symbols))
-print(f"共有 {len(new_symbols)} 只股票需要同步")
+sync_symbols_num = len(new_symbols)
+math.floor(sync_symbols_num / max_query)
+print(f"共有 {sync_symbols_num} 只股票需要同步")
 for symbol in new_symbols:
     data_index += 1
     symbol_list.append({"code": symbol})
     try:
-        if data_index % max_query == 0:
+        if data_index % max_query == 0 or data_index == sync_symbols_num:
             request_data = {
                 "trace": "edd5df80-df7f-4acf-8f67-68fd2f096426",
                 "data": {
                     "symbol_list": symbol_list
                 }
             }
-
             request_url = f"{base_alltick_url}{json.dumps(request_data)}"
             response = requests.get(request_url, headers=test_header)
             if response.status_code == 200:
