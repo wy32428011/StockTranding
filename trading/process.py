@@ -8,6 +8,7 @@ from fastapi import WebSocket
 from db.database import get_db
 from executors.chain_executors import get_chain_executor
 from models.investment_rating import InvestmentRating
+from models.stock_data_report import StockDataReport
 from models.stock_report import StockReport
 
 
@@ -34,6 +35,15 @@ async def process_stock_chunk_with_chain_ws(stock_code: str, websocket: WebSocke
             except Exception as ex:
                 print(f"发送股票 {stock_code} 分析失败: {ex}")
         print(result)
+        db: Session = next(get_db())
+        stock_data_report = StockDataReport(
+            symbol=stock_code,
+            analysis_content=result,
+            analysis_date=datetime.utcnow()
+        )
+        db.add(stock_data_report)
+        db.commit()
+        db.refresh(stock_data_report)
         # if result.startswith("{'properties':"):
         #     result = result.replace("{'properties':","").rstrip("}")
         # parser = JsonOutputParser(pydantic_object=StockReport)
