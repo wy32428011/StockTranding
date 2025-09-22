@@ -1,6 +1,7 @@
 import pandas as pd
 from fastapi import APIRouter, WebSocket
 
+from executors.chain_executors import get_chain_executor_stock_analysis
 from trading.process import process_stock_chunk_with_chain_ws
 
 stock_api = APIRouter()
@@ -38,3 +39,18 @@ async def get_all_stock_spot_ws(websocket: WebSocket):
 
     except Exception as ex:
         print(f"股票实时行情 WebSocket 连接异常: {ex}")
+
+@stock_api.websocket("/all-stock-analysis-ws")
+async def get_chain_executor_stock_analysis_ws(websocket: WebSocket):
+    """
+    获取股票分析链执行器
+    :return:
+    """
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_json()
+            if data:
+                await get_chain_executor_stock_analysis(data['symbol'],data['content'])
+    except Exception as ex:
+        print(f"股票分析链执行器 WebSocket 连接异常: {ex}")

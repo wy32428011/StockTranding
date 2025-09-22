@@ -26,6 +26,7 @@ def get_chat_openai():
         base_url=base_url,
         api_key=api_key,
         model=model,
+        max_tokens=2560000
     )
     return llm
 

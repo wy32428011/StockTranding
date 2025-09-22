@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from fastapi import WebSocket
 
 from db.database import get_db
-from executors.chain_executors import get_chain_executor
+from executors.chain_executors import get_chain_executor, get_chain_executor_stock_analysis
 from models.investment_rating import InvestmentRating
 from models.stock_data_report import StockDataReport
 from models.stock_report import StockReport
@@ -64,6 +64,11 @@ async def process_stock_chunk_with_chain_ws(stock_code: str, websocket: WebSocke
         # db.add(rating_record)
         # db.commit()
         # db.refresh(rating_record)
+        ss_result = result
+        if result.find("</think>") != -1:
+            ss_result = result.split("</think>")[1]
+        print(f"股票 {stock_code} 分析内容:\n {ss_result}")
+        await get_chain_executor_stock_analysis(stock_code,ss_result)
         return result
     except Exception as e:
         print(f"股票 {stock_code} 分析失败: {e}")
