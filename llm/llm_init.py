@@ -1,5 +1,7 @@
 import json
 
+from langchain.chat_models import init_chat_model
+
 
 def get_chat_openai():
     """
@@ -22,11 +24,16 @@ def get_chat_openai():
     model = LLM_CONFIG.get("model")
     if not model:
         raise ValueError("OpenAI model is not configured")
-    llm = ChatOpenAI(
+    # llm = ChatOpenAI(
+    #     base_url=base_url,
+    #     api_key=api_key,
+    #     model=model
+    # )
+    llm = init_chat_model(
         base_url=base_url,
         api_key=api_key,
         model=model,
-        max_tokens=2560000
+        model_provider="openai"
     )
     return llm
 

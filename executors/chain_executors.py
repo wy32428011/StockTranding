@@ -42,8 +42,9 @@ async def get_chain_executor_stock_analysis(symbol: str, content: str):
     db: Session = next(get_db())
     # datas = []
     # data = db.query(StockDataReport).filter(StockDataReport.symbol == symbol).order_by(StockDataReport.analysis_date.desc()).first()
-    result = await llm.ainvoke("格式化给出数据,不要省略任何内容，按照类目将对应的内容以markdown形式写入对应字段：" + content)
-    print(f"================================>股票分析: {result}")
+    result_str = await llm.ainvoke(f"从以下文本提取所需信息,不需要省略和概况，直接将所有信息提取出来,如果没有则返回空字符串:{content}")
+    print(f"================================>股票分析: {result_str}")
+    result = result_str.json(indent=2)
     # 保存分析结果
     analysis = StockAnalysisMarkdown(
         symbol=symbol,
