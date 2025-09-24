@@ -51,7 +51,8 @@ async def get_all_stock_chunk_spot_ws(websocket: WebSocket):
             if data == 'all':
                 df = pd.read_csv('./tools/A股股票列表.csv',
                                  encoding='utf-8',
-                                 dtype={'代码': str,'名称': str})
+                                 dtype={'代码': str,'名称': str,'最新价': float})
+                df = df[df['最新价'] < 25]
                 df = df['代码'].tolist()
                 await process_stock_chunk_with_chain_ws_analysis(df, websocket)
 
