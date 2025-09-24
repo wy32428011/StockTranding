@@ -1,3 +1,4 @@
+import asyncio
 import json
 from datetime import datetime
 
@@ -35,43 +36,64 @@ async def process_stock_chunk_with_chain_ws(stock_code: str, websocket: WebSocke
             except Exception as ex:
                 print(f"发送股票 {stock_code} 分析失败: {ex}")
         print(result)
+
+        ss_result = result
+        if result.find("</think>") != -1:
+            ss_result = result.split("</think>")[1]
+        print(f"股票 {stock_code} 分析内容:\n {ss_result}")
         db: Session = next(get_db())
         stock_data_report = StockDataReport(
             symbol=stock_code,
-            analysis_content=result,
+            analysis_content=ss_result,
             analysis_date=datetime.utcnow()
         )
         db.add(stock_data_report)
         db.commit()
         db.refresh(stock_data_report)
-        # if result.startswith("{'properties':"):
-        #     result = result.replace("{'properties':","").rstrip("}")
-        # parser = JsonOutputParser(pydantic_object=StockReport)
-        # parsed_result = parser.parse(result)
-        # print("parsed_result",parsed_result)
-        # db: Session = next(get_db())
-        # 假设result中包含symbol和name信息
-        # rating_record = InvestmentRating(
-        #     symbol=parsed_result.get('symbol', ''),
-        #     name=parsed_result.get('name', ''),
-        #     rating=parsed_result['investment_rating'],
-        #     current_price=parsed_result.get('current_price', None),
-        #     target_price=parsed_result.get('target_price', None),
-        #     analysis_date=datetime.strptime(parsed_result.get('analysis_date', ''), '%Y-%m-%d') if parsed_result.get(
-        #         'analysis_date') else None,
-        #     result_json=parsed_result
-        # )
-        # db.add(rating_record)
-        # db.commit()
-        # db.refresh(rating_record)
-        ss_result = result
-        if result.find("</think>") != -1:
-            ss_result = result.split("</think>")[1]
-        print(f"股票 {stock_code} 分析内容:\n {ss_result}")
-        await get_chain_executor_stock_analysis(stock_code,ss_result)
+        # await get_chain_executor_stock_analysis(stock_code,ss_result)
         return result
     except Exception as e:
         print(f"股票 {stock_code} 分析失败: {e}")
         await websocket.send_text(f"股票 {stock_code} 分析失败: {e}")
         return None
 
+async def process_stock_chunk_with_chain_ws_analysis(stock_code: list, websocket: WebSocket):
+    """
+    :param stock_code: 股票代码列表
+    :param websocket: WebSocket连接对象
+    :return: 无
+    """
+    # TODO: 多线程调用process_stock_chunk_with_chain_ws方法来处理股票代码列表
+    """
+       :param stock_code: 股票代码列表
+       :param websocket: WebSocket连接对象
+       :param max_concurrent_tasks: 最大并发任务数(线程数)，默认5
+       :return: 无
+       """
+    if not stock_code:
+        await websocket.send_text("股票代码列表为空，无需处理")
+        return
+    max_concurrent_tasks = 6
+    # 确保并发任务数至少为1
+    max_concurrent_tasks = max(1, max_concurrent_tasks)
+
+    # 分割股票列表为多个块，每个块包含最多max_concurrent_tasks个股票代码
+    def split_into_chunks(lst, chunk_size):
+        return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
+
+    chunks = split_into_chunks(stock_code, max_concurrent_tasks)
+    total_chunks = len(chunks)
+
+    await websocket.send_text(
+        f"开始处理股票列表，共{len(stock_code)}支股票，分为{total_chunks}个块，每块最多{max_concurrent_tasks}支股票")
+
+    for chunk_idx, chunk in enumerate(chunks, 1):
+        await websocket.send_text(f"开始处理第{chunk_idx}/{total_chunks}块，包含股票: {chunk}")
+        try:
+            # 为当前块中的每个股票创建处理任务
+            tasks = [process_stock_chunk_with_chain_ws(stock, websocket) for stock in chunk]
+            # 并发执行当前块的所有任务
+            await asyncio.gather(*tasks)
+            await websocket.send_text(f"第{chunk_idx}/{total_chunks}块处理完成")
+        except Exception as e:
+            await websocket.send_text(f"处理第{chunk_idx}/{total_chunks}块时发生错误: {str(e)}")

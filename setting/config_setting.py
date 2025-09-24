@@ -1,6 +1,6 @@
 # 模型配置
 LLM_CONFIG = {
-    "base_url": "http://172.24.205.153:20000/v1",
+    "base_url": "http://192.168.60.146:9090/v1",
     "api_key": "qwen",
     "model": "qwen",
     # "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
@@ -16,10 +16,10 @@ OLLAMA_CHAT_CONFIG = {
 # 数据库配置
 DB_CONFIG = {
     "type": "mysql",
-    "host": "192.168.50.19",
+    "host": "192.168.60.118",
     "port": 3306,
     "user": "root",
-    "password": "root",
+    "password": "wxzn*123",
     "database": "investment_ratings"
 }
 ALLTICK_CONFIG = {
