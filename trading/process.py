@@ -64,12 +64,7 @@ async def process_stock_chunk_with_chain_ws_analysis(stock_code: list, websocket
     :return: 无
     """
     # TODO: 多线程调用process_stock_chunk_with_chain_ws方法来处理股票代码列表
-    """
-       :param stock_code: 股票代码列表
-       :param websocket: WebSocket连接对象
-       :param max_concurrent_tasks: 最大并发任务数(线程数)，默认5
-       :return: 无
-       """
+
     if not stock_code:
         await websocket.send_text("股票代码列表为空，无需处理")
         return

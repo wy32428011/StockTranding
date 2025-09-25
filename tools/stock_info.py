@@ -21,4 +21,4 @@ async def get_stock_info():
     data_all.to_csv("A股股票列表.csv", index=False, encoding="utf_8")
 
 
-# asyncio.run(get_stock_info())
+asyncio.run(get_stock_info())
