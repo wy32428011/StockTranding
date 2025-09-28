@@ -1,4 +1,5 @@
 import os
+from pprint import pformat
 
 import numpy as np
 import pandas as pd
@@ -28,7 +29,7 @@ def get_stock_history(symbol: str) -> str:
     return df.tail(30).to_string(index=False)
 
 @tool
-def tech_tool(symbol: str) -> dict:
+def tech_tool(symbol: str) -> str:
     """
     计算技术指标：计算MA5/MA10、MACD、RSI
     :param symbol: 股票编码
@@ -61,7 +62,7 @@ def tech_tool(symbol: str) -> dict:
         nbdevdn=2,  # 下轨标准差倍数
         matype=MA_Type.SMA,   # 移动平均类型（0=SMA）
     )
-    return {
+    result = pformat({
         "MA5": ma5,
         "MA10": ma10,
         "MACD": macd,
@@ -72,7 +73,9 @@ def tech_tool(symbol: str) -> dict:
         "UPPER": upper,
         "MIDDLE": middle,
         "LOWER": lower,
-    }
+    })
+    print(result)
+    return '{' + result + '}'
 
 
 @tool
