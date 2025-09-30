@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import TypedDict, Annotated, Literal
 
 from pydantic import BaseModel, Field
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Float
 from sqlalchemy.dialects.mysql import LONGTEXT
 
 from db.database import Base
@@ -27,8 +27,8 @@ class StockAnalysisMarkdown(Base):
     conclusion = Column(LONGTEXT,comment="结论")  # 分析内容
     risk_level = Column(String(20),comment="综合风险等级")  # 综合风险等级
     investment_rating = Column(String(20),comment="投资评级")  # 投资评级
-    suggest_buy_price = Column(DateTime, default=datetime.now(),comment="建议买入价格")  # 建议买入价格
-    buy_duration = Column(String(20),comment="买入时长")  # 买入时长
+    suggest_buy_price = Column(Float,comment="建议买入价格")  # 建议买入价格
+    buy_duration = Column(String(500),comment="买入时长")  # 买入时长
 
 
 

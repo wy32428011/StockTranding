@@ -1,12 +1,14 @@
 import asyncio
+import datetime
 
 from langchain.agents import create_openai_tools_agent, AgentExecutor
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from sqlalchemy.orm import Session
+from fastapi import WebSocket
 
 from db.database import get_db
-from llm.llm_init import get_chat_openai
+from llm.llm_init import get_chat_openai, get_format_llm
 from llm.prompt_init import get_prompt_chain, get_prompt
 from models.stock_analysis_makdown import StockAnalysisMarkdown, StockAnalysisMarkdownModel
 from models.stock_data_report import StockDataReport
@@ -25,17 +27,18 @@ def get_chain_executor():
     stock_schema = str(StockReport.model_json_schema()).replace('{', '{{').replace('}', '}}')
     # prompt = get_prompt_chain(stock_schema)
     prompt = get_prompt()
-    tools = [get_stock_info_csv, get_stock_history, tech_tool, bocha_websearch_tool]
+    # tools = [get_stock_info_csv, get_stock_history, tech_tool, bocha_websearch_tool]
     # llm = llm.bind_tools(tools)
-    # tools = [get_stock_info_csv, get_stock_history, tech_tool]
+    tools = [get_stock_info_csv, get_stock_history, tech_tool]
     agent = create_openai_tools_agent(llm, tools, prompt)
     executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
     return executor
 
 
-async def get_chain_executor_stock_analysis(symbol: str, content: str):
+async def get_chain_executor_stock_analysis(symbol: str, content: str, websocket: WebSocket):
     """
     获取股票分析链执行器
+    :param websocket: WebSocket 连接
     :param content: 股票数据
     :param symbol: 股票代码
     :return:
@@ -65,16 +68,16 @@ async def get_chain_executor_stock_analysis(symbol: str, content: str):
         "请提取股票分析数据,不需要删减内容，按照标题将完整的markdown内容提取出来，如果没有相关信息则返回空字符串：\n{content}"
     )
     formatted_prompt = prompt_template.format(content=content)
-    await asyncio.sleep(1)
+    # await asyncio.sleep(1)
     try:
-        print("================================>结构化------》开始")
+        await websocket.send_text(f"================================>结构化------》开始")
         result = llm.invoke(formatted_prompt)
-        print(f"================================>结构化: {result}")
+        await websocket.send_text(f"================================>结构化: {result}")
         # 保存分析结果
         analysis = StockAnalysisMarkdown(
             symbol=symbol,
             stock_name=result.stock_name,
-            analysis_date=result.analysis_date,
+            analysis_date=datetime.datetime.now(),
             fundamental_analysis=result.fundamental_analysis,
             trading_data_dynamic_analysis=result.trading_data_dynamic_analysis,
             technical_indicator_analysis=result.technical_indicator_analysis,
